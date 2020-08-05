@@ -181,9 +181,10 @@ static lgw_context_t lgw_context = {
 FILE * log_file = NULL;
 
 /* I2C temperature sensor handles */
+#if USE_I2C_SENSOR
 static int     ts_fd = -1;
 static uint8_t ts_addr = 0xFF;
-
+#endif
 /* -------------------------------------------------------------------------- */
 /* --- PRIVATE FUNCTIONS DECLARATION ---------------------------------------- */
 
@@ -745,7 +746,7 @@ int lgw_start(void) {
 /* ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ */
 
 int lgw_stop(void) {
-    int i, err;
+    int i;
 
     DEBUG_MSG("INFO: aborting TX\n");
     for (i = 0; i < LGW_RF_CHAIN_NB; i++) {
@@ -762,7 +763,7 @@ int lgw_stop(void) {
     lgw_disconnect();
 #if USE_I2C_SENSOR
     DEBUG_MSG("INFO: Closing I2C\n");
-    err = i2c_linuxdev_close(ts_fd);
+    int err = i2c_linuxdev_close(ts_fd);
     if (err != 0) {
         printf("ERROR: failed to close I2C device (err=%i)\n", err);
     }
@@ -778,7 +779,7 @@ int lgw_receive(uint8_t max_pkt, struct lgw_pkt_rx_s *pkt_data) {
     uint8_t  nb_pkt_fetched = 0;
     uint16_t nb_pkt_found = 0;
     uint16_t nb_pkt_left = 0;
-    float current_temperature, rssi_temperature_offset;
+    float current_temperature = 0, rssi_temperature_offset;
 
     /* Check that AGC/ARB firmwares are not corrupted, and update internal counter */
     /* WARNING: this needs to be called regularly by the upper layer */
