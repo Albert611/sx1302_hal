@@ -4,7 +4,7 @@ Wants=network.target
 After=network.target
 
 [Service]
-ExecStart=/home/pi/sx1302_hal-master/gwstart.sh
+ExecStart=/home/pi/sx1302_hal/gwstart.sh
 ExecReload=/bin/kill -HUP $MAINPID
 Restart=on-failure
 KillMode=process
